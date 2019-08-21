@@ -1,6 +1,9 @@
 package com.nowcoder.community.controller;
 
+import com.nowcoder.community.entity.User;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
@@ -8,7 +11,12 @@ import org.springframework.web.bind.annotation.RequestMethod;
 public class HomeController {
 
     @RequestMapping(path = "/index", method = RequestMethod.GET)
-    public String getIndexPage() {
+    public String getIndexPage(Model model) {
+        // 认证成功后，结果会通过SecurityContextHolder存入SecurityContext中
+        Object object = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        if (object instanceof User) {
+            model.addAttribute("loginUser", object);
+        }
         return "/index";
     }
 
@@ -27,9 +35,9 @@ public class HomeController {
         return "/site/admin";
     }
 
-    @RequestMapping(path = "/loginpage", method = {RequestMethod.GET, RequestMethod.POST})
+    // 拒绝访问时的提示页面
+    @RequestMapping(path = "/denied", method = {RequestMethod.GET})
     public String getLoginPage() {
-        return "/site/login";
+        return "/error/404";
     }
-
 }
